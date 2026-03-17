@@ -1,0 +1,11 @@
+const express = require('express')
+const { default: mongoose } = require('mongoose')
+require('dotenv').config()
+const app = express()
+const port = process.env.PORT || 3000
+app.use(express.json())
+mongoose.connect(process.env.MONGODB)
+.then(()=>console.log('mongodb connected')).catch(err => console.log('problem in connection',err))
+app.use("/auth",require('./routes/authRoutes'))
+app.get('/', (req, res) => res.send('Hello World!'))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
