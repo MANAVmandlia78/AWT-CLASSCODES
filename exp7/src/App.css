@@ -1,0 +1,52 @@
+body {
+  font-family: Arial;
+  background: #f4f4f4;
+}
+
+.container {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Carousel */
+.carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel img {
+  width: 500px;
+  height: 250px;
+  margin: 10px;
+  border-radius: 10px;
+}
+
+/* FAQ */
+.faq {
+  width: 50%;
+  margin: 10px auto;
+  text-align: left;
+}
+
+.question {
+  background: #007bff;
+  color: white;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.answer {
+  background: #e9ecef;
+  padding: 10px;
+}
+
+/* Shopping */
+.filters button {
+  margin: 5px;
+  padding: 8px 12px;
+}
+
+ul {
+  list-style: none;
+}
