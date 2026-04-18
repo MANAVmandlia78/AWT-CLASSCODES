@@ -1,18 +1,7 @@
-const mysql = require("mysql2");
+const mongoose = require("mongoose");
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "crud_db"
-});
+mongoose.connect("mongodb://127.0.0.1:27017/crudDB")
+  .then(() => console.log("MongoDB Connected ✅"))
+  .catch(err => console.log("DB Error:", err));
 
-db.connect((err) => {
-  if (err) {
-    console.log("DB Error:", err);
-  } else {
-    console.log("MySQL Connected ✅");
-  }
-});
-
-module.exports = db;
+module.exports = mongoose;

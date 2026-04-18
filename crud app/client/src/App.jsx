@@ -41,9 +41,9 @@ function App() {
   };
 
   // ❌ Delete user
-  const deleteUser = async (id) => {
+  const deleteUser = async (_id) => {
     try {
-      await axios.delete(`${API}/delete/${id}`);
+      await axios.delete(`${API}/delete/${_id}`);
       getUsers();
     } catch (err) {
       setError("Delete failed");
@@ -52,7 +52,7 @@ function App() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Simple CRUD App</h2>
+      <h2>Simple CRUD App (MongoDB)</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -69,9 +69,11 @@ function App() {
 
       <ul>
         {users.map((user) => (
-          <li key={user.id}>
+          <li key={user._id}>
             {user.name}
-            <button onClick={() => deleteUser(user.id)}>Delete</button>
+            <button onClick={() => deleteUser(user._id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>

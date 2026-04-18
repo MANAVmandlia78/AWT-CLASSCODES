@@ -1,14 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const db = require("./db");
+
+require("./db");
+const User = require("./models/User");
 
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 
-/* ================= GLOBAL ERROR HANDLER ================= */
+/* ================= ERROR HANDLER ================= */
 const handleError = (res, err, message = "Server Error") => {
   console.error(err);
   return res.status(500).json({
@@ -19,7 +21,7 @@ const handleError = (res, err, message = "Server Error") => {
 };
 
 /* ================= CREATE ================= */
-app.post("/add", (req, res) => {
+app.post("/add", async (req, res) => {
   try {
     const { name } = req.body;
 
@@ -30,70 +32,60 @@ app.post("/add", (req, res) => {
       });
     }
 
-    const sql = "INSERT INTO users (name) VALUES (?)";
+    const user = new User({ name });
+    await user.save();
 
-    db.query(sql, [name], (err, result) => {
-      if (err) return handleError(res, err, "Failed to add user");
-
-      res.status(201).json({
-        success: true,
-        message: "User Added ✅",
-      });
+    res.status(201).json({
+      success: true,
+      message: "User Added ✅",
+      data: user,
     });
+
   } catch (error) {
     handleError(res, error);
   }
 });
 
 /* ================= READ ================= */
-app.get("/users", (req, res) => {
+app.get("/users", async (req, res) => {
   try {
-    const sql = "SELECT * FROM users";
+    const users = await User.find();
 
-    db.query(sql, (err, result) => {
-      if (err) return handleError(res, err, "Failed to fetch users");
-
-      res.status(200).json({
-        success: true,
-        data: result,
-      });
+    res.json({
+      success: true,
+      data: users,
     });
+
   } catch (error) {
     handleError(res, error);
   }
 });
 
 /* ================= DELETE ================= */
-app.delete("/delete/:id", (req, res) => {
+app.delete("/delete/:id", async (req, res) => {
   try {
-    const { id } = req.params;
+    const user = await User.findByIdAndDelete(req.params.id);
 
-    const sql = "DELETE FROM users WHERE id=?";
-
-    db.query(sql, [id], (err, result) => {
-      if (err) return handleError(res, err, "Delete failed");
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
-        });
-      }
-
-      res.json({
-        success: true,
-        message: "User Deleted ✅",
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
+    }
+
+    res.json({
+      success: true,
+      message: "User Deleted ✅",
     });
+
   } catch (error) {
     handleError(res, error);
   }
 });
 
 /* ================= UPDATE ================= */
-app.put("/update/:id", (req, res) => {
+app.put("/update/:id", async (req, res) => {
   try {
-    const { id } = req.params;
     const { name } = req.body;
 
     if (!name) {
@@ -103,23 +95,25 @@ app.put("/update/:id", (req, res) => {
       });
     }
 
-    const sql = "UPDATE users SET name=? WHERE id=?";
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { name },
+      { new: true }
+    );
 
-    db.query(sql, [name, id], (err, result) => {
-      if (err) return handleError(res, err, "Update failed");
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
-        });
-      }
-
-      res.json({
-        success: true,
-        message: "User Updated ✅",
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
+    }
+
+    res.json({
+      success: true,
+      message: "User Updated ✅",
+      data: user,
     });
+
   } catch (error) {
     handleError(res, error);
   }
